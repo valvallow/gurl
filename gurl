@@ -8,7 +8,7 @@
 (use google.experimental.googl)
 
 (define default-api-key
-  (make-parameter "AIzaSyAhmmU4YWKR44YbVjNN_MGk7N5ln1_YTTM"))
+  (make-parameter "your api key"))
 
 (define (usage)
   (print "usage: gurl [-s | -e | -j | -u | -k | -h] <url>")
