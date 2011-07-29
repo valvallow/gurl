@@ -1,0 +1,43 @@
+#!/usr/local/bin/gosh
+
+(use rfc.json)
+(use gauche.parameter)
+(use gauche.parseopt)
+(use util.list)
+
+(use google.experimental.googl)
+
+(define default-api-key
+  (make-parameter "AIzaSyAhmmU4YWKR44YbVjNN_MGk7N5ln1_YTTM"))
+
+(define (usage)
+  (print "usage: gurl [-s | -e | -j | -u | -k | -h] <url>")
+  (print "   -s | shorten")
+  (print "   -e | expand")
+  (print "   -j | display json")
+  (print "   -u | url='shorten or expand target url'")
+  (print "   -k | api-key='your-api-key'")
+  (print "   -h | display usage")
+  (exit 0))
+
+(define (main args)
+  (let-args (cdr args)
+      ((api-key "k|api-key=s" (default-api-key))
+       (url "u|url=s")
+       (shorten "s|shorten")
+       (expand "e|expand")
+       (json "j|json")
+       (help "-h|help" => usage)
+       . rest-args)
+    (let ((api-key (or api-key (default-api-key)))
+          (url (or url
+                   (and (not (null? rest-args))
+                        (car rest-args))
+                   (read-line))))
+      (let ((response (cond (shorten (shorten-url url api-key))
+                            (expand (expand-url url api-key))
+                            (else (usage)))))
+        (print (cond (json (construct-json-string response))
+                     (shorten (assoc-ref response "id"))
+                     (expand (assoc-ref response "longUrl"))
+                     (else (exit 1 "aborted"))))))))
